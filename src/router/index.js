@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Index from '@/views/Index'
 /* router-array */
 import Account from '@/router/account'
+import Borrow from '@/router/borrow'
 
 Vue.use(Router)
 
@@ -15,7 +16,8 @@ let routes = [
   }
 ]
 routes.push(...[
-  ...Account
+  ...Account,
+  ...Borrow
 ])
 
 export default new Router({
