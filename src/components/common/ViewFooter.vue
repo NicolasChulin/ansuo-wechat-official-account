@@ -22,7 +22,7 @@ export default {
           icon: 'icon-createtask'
         },
         {
-          type: 'Designer',
+          type: '',
           name: '扫一扫',
           icon: 'icon-scan'
         },
@@ -41,7 +41,11 @@ export default {
   },
   methods: {
     switchMenu (item) {
-      this.$router.push({name: item.type})
+      if (item.type) {
+        this.$router.push({name: item.type})
+      } else {
+        this.$layout.msg('这是扫一扫')
+      }
     }
   }
 }

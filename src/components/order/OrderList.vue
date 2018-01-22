@@ -5,9 +5,9 @@
         <ul class="item-list">
           <li class="items items-icon-right" v-for="i in 10" @click="toDetail(1)">
             <div class="item-infos">
-              <p><span>手环编号：</span><span>H-003</span></p>
+              <p><span>手环编号：</span><span>HA-123123123</span></p>
               <p><span>创建时间：</span><span>2018-01-02</span></p>
-              <p v-if="vstatus === 0"><span>手环状态：</span><span>在线（已绑定人员）</span></p>
+              <p v-if="vstatus === 0"><span>手环状态：</span><span>离线</span></p>
             </div>
             <i class="iconfont icon-arrow-right"></i>
           </li>
