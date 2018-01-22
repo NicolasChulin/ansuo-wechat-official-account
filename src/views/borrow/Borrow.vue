@@ -69,7 +69,31 @@ export default {
   components: {
     Tips
   },
+  mounted () {
+    this.initOpenid()
+  },
   methods: {
+    initOpenid () {
+      if (!this.$isWeixin) return
+      this.openid = this.$ls.get('openid')
+      if (!this.openid) {
+        let code = this.$route.query.code
+        let state = this.$route.query.state
+        if (code && state) {
+          this.getOpenid({
+            code, state
+          }, (openid) => {
+            this.openid = openid
+            this.getList()
+          })
+        } else {
+          this.toGetWxCode()
+        }
+      }
+    },
+    getList () {
+      console.log(this.openid)
+    },
     selectAll () {
       let that = this
       that.allisSelected = !that.allisSelected

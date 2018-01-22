@@ -11,6 +11,7 @@ import App from './App'
 import router from './router'
 import GLOBAL from './config'
 import layout from '@/assets/plugins/layout/layout'
+import WeixinSdk from '@/assets/plugins/weixinSdk'
 
 Vue.config.productionTip = false
 Vue.use(VueLocalStorage)
@@ -21,6 +22,7 @@ Vue.use(VueLazyload, {
 })
 Vue.prototype.GLOBAL = GLOBAL
 Vue.use(layout)
+Vue.use(WeixinSdk)
 
 /* axios.interceptors */
 var requeen = []
