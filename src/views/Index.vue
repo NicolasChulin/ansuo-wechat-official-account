@@ -1,39 +1,104 @@
 <template lang="html">
   <div class="index">
-    <view-header></view-header>
-    <div class="view-content">
-      <h1>{{ msg }}</h1>
-      <br>
-      <div class="msg" @click="say">
-        点我谈一个消息
+    <div class="view-header">
+      <div class="ind-menu">
+        <ul>
+          <li v-for="(item, index) in menus" :class="{'act': menuIndex === index}" @click="switchMenu(index)">{{item.name}}</li>
+        </ul>
       </div>
     </div>
-    <view-footer></view-footer>
+    <div class="view-content">
+      <swiper :options="swiperOption" :not-next-tick="notNextTick" ref="IndexSwiper">
+        <swiper-slide v-for="(item, index) in menus" :key="item.index">
+          <home-list :vstatus="item.status" :ref="item.ref"></home-list>
+        </swiper-slide>
+      </swiper>
+    </div>
+    <view-footer mtype="Home"></view-footer>
   </div>
 </template>
 
 <script>
-import ViewHeader from '@/components/common/ViewHeader'
 import ViewFooter from '@/components/common/ViewFooter'
+import HomeList from '@/components/home/HomeList'
 
 export default {
   name: 'index',
   data () {
     return {
-      msg: 'hello world'
+      menuIndex: 0,
+      menus: [
+        {
+          name: '全部',
+          status: 0,
+          ref: 'slide0'
+        },
+        {
+          name: '报警',
+          status: 1,
+          ref: 'slide1'
+        },
+        {
+          name: '离线',
+          status: 2,
+          ref: 'slide2'
+        },
+        {
+          name: '在线',
+          status: 3,
+          ref: 'slide3'
+        }
+      ],
+      notNextTick: true,
+      swiperOption: {
+        setWrapperSize: true,
+        slidesPerView: 1
+      },
+      firstLoadedItem: []
     }
   },
   components: {
     ViewFooter,
-    ViewHeader
+    HomeList
+  },
+  mounted () {
+    let that = this
+    that.$refs.IndexSwiper.swiper.on('slideChangeEnd', (swiper) => {
+      that.switchMenu(swiper.realIndex, 'swiper')
+    })
+    that.switchMenu(0)
   },
   methods: {
-    say () {
-      this.$layout.msg('1111')
+    switchMenu (index, type = 'default') {
+      let that = this
+      that.menuIndex = index
+      if (that.firstLoadedItem.indexOf(index) < 0) {
+        that.firstLoadedItem.push(index)
+        // that.$refs['slide' + index].refresh()
+      }
+      if (type === 'default') {
+        that.$refs.IndexSwiper.swiper.slideTo(index)
+      }
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.ind-menu{
+  height: .8rem;
+  ul{
+    overflow: hidden;
+  }
+  li{
+    width: 25%;
+    float: left;
+    line-height: .8rem;
+    text-align: center;
+    color: $gray;
+  }
+  li.act{
+    color: $pbrown;
+  }
+}
 </style>

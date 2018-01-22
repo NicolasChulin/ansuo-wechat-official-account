@@ -78,7 +78,7 @@
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "url-loader": "^0.5.8",
-    "vue-awesome-swiper": "^3.1.2",
+    "vue-awesome-swiper": "^2.6.7",
     "vue-lazyload": "^1.1.4",
     "vue-loader": "^12.1.0",
     "vue-ls": "^2.3.3",

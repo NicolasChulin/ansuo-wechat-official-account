@@ -70,18 +70,15 @@ new Vue({
 })
 
 /* regist routes hook */
-// let noLogin = [
-//   'Login', 'Register', 'ForgetPswd', 'Index'
-// ]
-// router.beforeEach((to, from, next) => {
-//   var token = Vue.ls.get('memberToken')
-//   if (token) {
-//     next()
-//   } else {
-//     if (noLogin.indexOf(to.name) > -1) {
-//       next()
-//     } else {
-//       next('Login')
-//     }
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  var token = Vue.ls.get('memberToken')
+  if (token) {
+    next()
+  } else {
+    if (to.meta.requireLogin) {
+      next('Login')
+    } else {
+      next()
+    }
+  }
+})
