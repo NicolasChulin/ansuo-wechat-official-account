@@ -44,7 +44,13 @@ export default {
       if (item.type) {
         this.$router.push({name: item.type})
       } else {
-        this.$layout.msg('这是扫一扫')
+        if (this.$isWeixin) {
+          this.registScanQRCode((res) => {
+            alert(res)
+          })
+        } else {
+          this.$layout.msg('这是扫一扫')
+        }
       }
     }
   }

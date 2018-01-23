@@ -7,5 +7,8 @@ export default {
   // wiexin
   wxAccessToken (datas, success, error) {
     api._post('/weixin/getOAuth2AccessToken', datas, success, error)
+  },
+  getJsApiParameter (datas, success, error) {
+    api._post('/weixin/getJsApiParameter', datas, success, error)
   }
 }

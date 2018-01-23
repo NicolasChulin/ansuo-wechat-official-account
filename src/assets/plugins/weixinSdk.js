@@ -1,6 +1,6 @@
 import GLOBAL from '@/config'
 import wx from 'weixin-js-sdk'
-import home from '@/apis/home'
+import homeApi from '@/apis/home'
 import VueLocalStorage from 'vue-ls'
 
 export default {
@@ -16,12 +16,12 @@ export default {
           let datas = {
             url: window.location.href.split('#')[0]
           }
-          Vue.http.post(GLOBAL.domain + '/weixin/getJsApiParameter', datas).then((rep) => {
+          homeApi.getJsApiParameter(datas, (rep) => {
             let data = rep.data
             if (data.code === 200) {
               const wxApiList = ['scanQRCode']
               wx.config({
-                debug: false,
+                debug: true,
                 appId: data.data.appId,
                 timestamp: parseInt(data.data.timestamp),
                 nonceStr: data.data.nonceStr,
@@ -48,7 +48,7 @@ export default {
           window.location.href = GLOBAL.domain + '/weixin/redirectOAuth2Url?url=' + encodeURIComponent(redirectUri)
         },
         getOpenid (datas, success) {
-          home.wxAccessToken(datas, (rep) => {
+          homeApi.wxAccessToken(datas, (rep) => {
             let data = rep.data
             if (data.code === 200 && data.data) {
               VueLocalStorage.set('openid', data.data.openid, 7 * 24 * 60 * 60)
