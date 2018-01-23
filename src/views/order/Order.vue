@@ -29,11 +29,11 @@ export default {
     return {
       menuIndex: 0,
       menus: [
-        {
-          name: '全部',
-          status: 0,
-          ref: 'slide0'
-        },
+        // {
+        //   name: '全部',
+        //   status: 0,
+        //   ref: 'slide0'
+        // },
         {
           name: '未支付',
           status: 1,
@@ -92,7 +92,7 @@ export default {
     overflow: hidden;
   }
   li{
-    width: 25%;
+    width: 33.33%;
     float: left;
     line-height: .8rem;
     text-align: center;

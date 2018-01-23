@@ -7,7 +7,7 @@
             <div class="item-infos">
               <p><span>手环编号：</span><span>HA-123123123</span></p>
               <p><span>创建时间：</span><span>2018-01-02</span></p>
-              <p v-if="vstatus === 0"><span>手环状态：</span><span>离线</span></p>
+              <p v-if="vstatus === 3"><span>退款状态：</span><span v-if="Math.random() > 0.5">已申请</span><span v-else>已退款</span></p>
             </div>
             <i class="iconfont icon-arrow-right"></i>
           </li>

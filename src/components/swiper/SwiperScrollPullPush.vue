@@ -148,13 +148,13 @@ export default {
 }
 .pull-down-loading, .pull-up-loading{
   height: 50px;
-  padding: 5px 0;
+  padding: 10px 0;
   span{
     display: block;
-    width: 63px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     margin: 0 auto;
-    background: url(/static/images/loading.gif) no-repeat;
+    background: url('/static/images/loading.gif') no-repeat;
     background-size: 100% 100%;
   }
 }
