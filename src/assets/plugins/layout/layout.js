@@ -57,6 +57,9 @@ export default {
       loading () {
         $vmLoading.show = true
         layout.isLoadingShow = true
+        setTimeout(function () {
+          layout.loadingHide()
+        }, 10 * 1000)
       },
       loadingHide () {
         $vmLoading.show = false

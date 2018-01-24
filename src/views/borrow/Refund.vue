@@ -1,9 +1,9 @@
 <template lang="html">
   <div class="refund">
-    <div class="b-top">
+    <!-- <div class="b-top">
       <p>报警手机号：18912345678</p>
       <span>广告机编号：A02</span>
-    </div>
+    </div> -->
     <div class="b-list">
       <ul>
         <li v-for="item in list">
@@ -77,25 +77,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.b-top{
-  padding: .4rem 0 .3rem;
-  text-align: center;
-  p{
-    color: $brown;
-    margin-bottom: .2rem;
-  }
-  span{
-    display: block;
-    margin: 0 auto;
-    border-radius: .5rem;
-    width: 3rem;
-    height: .5rem;
-    line-height: .5rem;
-    background-color: $pbrown;
-    color: #fff;
-    font-size: .24rem;
-  }
-}
+// .b-top{
+//   padding: .4rem 0 .3rem;
+//   text-align: center;
+//   p{
+//     color: $brown;
+//     margin-bottom: .2rem;
+//   }
+//   span{
+//     display: block;
+//     margin: 0 auto;
+//     border-radius: .5rem;
+//     width: 3rem;
+//     height: .5rem;
+//     line-height: .5rem;
+//     background-color: $pbrown;
+//     color: #fff;
+//     font-size: .24rem;
+//   }
+// }
 .icon-unselected{
   background-image: url('/static/images/icon-unselected.png');
   background-size: 100% 100%;

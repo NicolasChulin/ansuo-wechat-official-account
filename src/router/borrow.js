@@ -1,6 +1,7 @@
 /* components */
 import Borrow from '@/views/borrow/Borrow'
 import Refund from '@/views/borrow/Refund'
+import PayWeixinCallback from '@/views/borrow/PayWeixinCallback'
 
 var borrow = [
   {
@@ -12,6 +13,11 @@ var borrow = [
     path: '/refund',
     name: 'Refund',
     component: Refund
+  },
+  {
+    path: '/pay/weixinCallback',
+    name: 'PayWeixinCallback',
+    component: PayWeixinCallback
   }
 ]
 

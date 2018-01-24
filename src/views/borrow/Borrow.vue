@@ -4,73 +4,46 @@
       <ul>
         <li v-for="item in list">
           <div class="li-avatar">
-            <img class="cover" :src="item.avatar" :alt="item.name">
+            <img class="cover" :src="item.avatar" :alt="item.nickname">
           </div>
           <div class="li-infos">
-            <p><span>图片编号：</span><span>{{item.imgNumber}}</span></p>
-            <p><span>图片信息：</span><span>{{item.name}}</span></p>
-            <p><span>关联手机：</span><span>{{item.mobile}}</span></p>
-            <p v-if="item.code"><span>手环编号：</span><span>{{item.code}}</span></p>
-            <p class="btn-bind" v-else>绑定手环</p>
+            <p><span>图片编号：</span><span>{{item.imageId}}</span></p>
+            <p><span>图片信息：</span><span>{{item.nickname}}</span></p>
+            <p><span>生成时间：</span><span>{{item.createTime}}</span></p>
+            <p v-if="item.braceletId"><span>手环编号：</span><span>{{item.braceletId}}</span></p>
+            <p class="btn-bind" @click="binding(item)" v-else>绑定手环</p>
           </div>
         </li>
       </ul>
     </div>
     <div class="b-bot">
       <i class="icon-weixin"></i>
-      <div class="btn-to-pay" @click="topay"></div>
+      <div class="btn-to-pay" @click="toPay"></div>
+      <router-link to="Refund">Refund</router-link>
     </div>
-
-    <transition name="fade">
-      <tips v-if="tipIsShow" :tip-class="tipClass" @close="topay"></tips>
-    </transition>
-
   </div>
 </template>
 
 <script>
+import borrowApi from '@/apis/borrow'
+import BuouUtil from '@/assets/plugins/BuouUtil'
 import Tips from '@/components/common/Tips'
 
 export default {
   name: 'borrow-list',
   data () {
     return {
-      list: [
-        {
-          avatar: '/static/images/avatar.png',
-          imgNumber: 'A01-121245643545',
-          name: '小美女',
-          mobile: '18512345678',
-          code: '',
-          isSelect: false
-        },
-        {
-          avatar: '/static/images/avatar.png',
-          imgNumber: 'A01-121245643545',
-          name: '小美女',
-          mobile: '18512345678',
-          code: 'H-01-001',
-          isSelect: false
-        },
-        {
-          avatar: '/static/images/avatar.png',
-          imgNumber: 'A01-121245643545',
-          name: '小美女',
-          mobile: '18512345678',
-          code: 'H-01-001',
-          isSelect: false
-        }
-      ],
-      allisSelected: false,
-      tipIsShow: false,
-      tipClass: 'tips-pay-success'
+      openId: '',
+      list: [],
+      newBindIds: []
     }
   },
   components: {
     Tips
   },
   mounted () {
-    this.initOpenid()
+    // this.initOpenid()
+    this.getList()
   },
   methods: {
     initOpenid () {
@@ -92,17 +65,78 @@ export default {
       }
     },
     getList () {
-      console.log(this.openid)
-    },
-    selectAll () {
       let that = this
-      that.allisSelected = !that.allisSelected
-      that.list.forEach((item) => {
-        item.isSelect = that.allisSelected
+      that.openId = 'ovT3r0iol17hvxZU2Pbrt4qDO2Hc'
+      let datas = {
+        openId: that.openId
+      }
+      borrowApi.borrowList(datas, (rep) => {
+        let data = rep.data
+        if (data.code === 200 && data.data) {
+          let list = []
+          data.data.forEach((item) => {
+            list.push({
+              id: item.id,
+              avatar: BuouUtil.getResizeImgUrl(item.imageUrl, 'sm'),
+              imageId: item.imageId,
+              nickname: item.nickName,
+              createTime: BuouUtil.timeFomate(item.createTime, 's'),
+              braceletId: item.braceletId
+            })
+          })
+          that.list = list
+        }
       })
     },
-    topay () {
-      this.tipIsShow = !this.tipIsShow
+    binding (item) {
+      let that = this
+      let braceids = ['123456', '234561', '345612', '123-01', '123-02', '123-03']
+      let braceletId = braceids[Math.floor(Math.random() * 6)]
+      let datas = {
+        braceletId: braceletId,
+        pictureId: item.id
+      }
+      borrowApi.binding(datas, (rep) => {
+        let data = rep.data
+        if (data.code === 200 && data.data) {
+          item.braceletId = braceletId
+          that.newBindIds.push(item.id)
+          that.$layout.msg('绑定成功！')
+        } else {
+          that.$layout.msg(data.message || '绑定失败，请重新尝试')
+        }
+      })
+      // that.registScanQRCode((braceletId) => {
+      //   let datas = {
+      //     braceletId: braceletId,
+      //     pictureId: item.imageId
+      //   }
+      //   borrowApi.binding(datas, (rep) => {
+      //     let data = rep.data
+      //     if (data.code === 200 && data.data) {
+      //       item.braceletId = braceletId
+      //       that.$layout.msg('绑定成功！')
+      //     } else {
+      //       that.$layout.msg(data.message || '绑定失败，请重新尝试')
+      //     }
+      //   })
+      // })
+    },
+    toPay () {
+      let that = this
+      let datas = {
+        openId: that.openId,
+        braceletLogIds: that.newBindIds.join()
+      }
+      borrowApi.topay(datas, (rep) => {
+        let data = rep.data
+        if (data.code === 200 && data.data) {
+          let redirectUri = document.location.origin + '/pay/weixinCallback?orderNumber=' + data.data
+          window.location.href = that.GLOBAL.domain + '/redirectOAuth2Url?url=' + encodeURIComponent(redirectUri)
+        } else {
+          that.$layout.msg(data.message || '绑定失败，请重新尝试')
+        }
+      })
     }
   }
 }
@@ -127,17 +161,19 @@ export default {
     background: $background;
     float: left;
     box-shadow: 5px 0px 15px rgba(135, 171, 208, .3);
-    // box-shadow: 5px 0px 20px #000;
   }
   .li-infos{
-    margin-left: 2.5rem;
+    margin-left: 2.3rem;
 
     p{
       height: .5rem;
-      line-height: .3rem;
-      padding: .1rem 0;
+      line-height: .4rem;
+      padding: .05rem 0;
       font-size: 0;
       color: $gbrown;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       span{
         display: inline-block;
         vertical-align: middle;

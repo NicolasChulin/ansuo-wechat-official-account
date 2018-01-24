@@ -1,18 +1,16 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 import axios from 'axios'
 import layout from '@/assets/plugins/layout/layout'
 import qs from 'qs'
 
-Vue.use(layout)
-
 const errorCallback = function (error) {
-  Vue.$layout.loadingHide()
+  layout.loadingHide()
   if (error.response) {
-    Vue.$layout.msg('网络错误，请稍后再试')
+    layout.msg('网络错误，请稍后再试')
   }
   // if (error.response) {
   //   console.log(error.response)
-  //   Vue.$layout.msg('网络错误，请稍后再试')
+  //   layout.msg('网络错误，请稍后再试')
   // } else if (error.request) {
   //   console.log(error.request)
   // } else {

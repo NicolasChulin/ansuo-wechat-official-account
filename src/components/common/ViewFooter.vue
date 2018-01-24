@@ -41,15 +41,22 @@ export default {
   },
   methods: {
     switchMenu (item) {
+      let that = this
       if (item.type) {
-        this.$router.push({name: item.type})
+        that.$router.push({name: item.type})
       } else {
-        if (this.$isWeixin) {
-          this.registScanQRCode((res) => {
+        if (that.$isWeixin) {
+          that.registScanQRCode((res) => {
             alert(res)
+            that.$router.push({
+              name: 'HomeDetail',
+              params: {
+                wristId: res
+              }
+            })
           })
         } else {
-          this.$layout.msg('这是扫一扫')
+          that.$layout.msg('这是扫一扫')
         }
       }
     }
