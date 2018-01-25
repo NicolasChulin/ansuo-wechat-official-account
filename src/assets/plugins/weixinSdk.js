@@ -1,7 +1,7 @@
 import GLOBAL from '@/config'
 import wx from 'weixin-js-sdk'
 import homeApi from '@/apis/home'
-// import VueLocalStorage from 'vue-ls'
+import VueLocalStorage from 'vue-ls'
 
 export default {
   install (Vue, option) {
@@ -45,18 +45,16 @@ export default {
         },
         toGetWxCode () {
           let redirectUri = window.location.href
-          window.location.href = GLOBAL.domain + '/weixin/redirectOAuth2Url?url=' + encodeURIComponent(redirectUri)
+          window.location.href = GLOBAL.domain + '/redirectOAuth2Url?url=' + encodeURIComponent(redirectUri)
         },
         getOpenid (datas, success) {
-          let openid = 'ovT3r0iol17hvxZU2Pbrt4qDO2Hc'
-          if (typeof success === 'function') success(openid)
-          // homeApi.wxAccessToken(datas, (rep) => {
-          //   let data = rep.data
-          //   if (data.code === 200 && data.data) {
-          //     VueLocalStorage.set('openid', data.data.openid, 7 * 24 * 60 * 60)
-          //     if (typeof success === 'function') success(data.data.openid)
-          //   }
-          // })
+          homeApi.getOAuth2AccessToken(datas, (rep) => {
+            let data = rep.data
+            if (data.code === 200 && data.data) {
+              VueLocalStorage.set('openid', data.data.openid, 7 * 24 * 60 * 60)
+              if (typeof success === 'function') success(data.data.openid)
+            }
+          })
         }
       }
     })

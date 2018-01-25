@@ -5,66 +5,115 @@
       <span>广告机编号：A02</span>
     </div> -->
     <div class="b-list">
-      <ul>
+      <ul v-if="list.length > 0">
         <li v-for="item in list">
           <div class="li-avatar">
-            <img class="cover" :src="item.avatar" :alt="item.name">
+            <img class="cover" :src="item.avatar" :alt="item.nickname">
           </div>
           <div class="li-infos">
-            <p><span>图片编号：</span><span>{{item.imgNumber}}</span></p>
-            <p><span>图片信息：</span><span>{{item.name}}</span></p>
-            <p><span>关联手机：</span><span>{{item.mobile}}</span></p>
-            <p><span>手环编号：</span><span>{{item.code}}</span></p>
+            <p><span>图片编号：</span><span>{{item.imageId}}</span></p>
+            <p><span>图片信息：</span><span>{{item.nickname}}</span></p>
+            <p><span>绑定时间：</span><span>{{item.createTime}}</span></p>
+            <p><span>手环编号：</span><span>{{item.braceletId}}</span></p>
           </div>
           <span class="li-select" :class="{'icon-selected': item.isSelect, 'icon-unselected': !item.isSelect}" @click="item.isSelect = !item.isSelect"></span>
         </li>
       </ul>
+      <none-data v-else></none-data>
     </div>
     <div class="b-bot">
       <div class="b-select" @click="selectAll">
         <span class="select-icon" :class="{'icon-selected': allisSelected, 'icon-unselected': !allisSelected}"></span>
         <span class="select-font"></span>
       </div>
-      <div class="btn-refund-deposit"></div>
+      <div class="btn-refund-deposit" @click="applyRefund"></div>
     </div>
   </div>
 </template>
 
 <script>
+import borrowApi from '@/apis/borrow'
+import BuouUtil from '@/assets/plugins/BuouUtil'
+import NoneData from '@/components/common/NoneData'
+
 export default {
   name: 'refund',
   data () {
     return {
-      list: [
-        {
-          avatar: '/static/images/avatar.png',
-          imgNumber: 'A01-121245643545',
-          name: '小美女',
-          mobile: '18512345678',
-          code: 'H-01-001',
-          isSelect: false
-        },
-        {
-          avatar: '/static/images/avatar.png',
-          imgNumber: 'A01-121245643545',
-          name: '小美女',
-          mobile: '18512345678',
-          code: 'H-01-001',
-          isSelect: false
-        },
-        {
-          avatar: '/static/images/avatar.png',
-          imgNumber: 'A01-121245643545',
-          name: '小美女',
-          mobile: '18512345678',
-          code: 'H-01-001',
-          isSelect: false
-        }
-      ],
+      list: [],
       allisSelected: false
     }
   },
+  components: {
+    NoneData
+  },
+  mounted () {
+    // this.initOpenid()
+    this.getList()
+  },
   methods: {
+    initOpenid () {
+      if (!this.$isWeixin) return
+      this.openid = this.$ls.get('openid')
+      if (!this.openid) {
+        let code = this.$route.query.code
+        let state = this.$route.query.state
+        if (code && state) {
+          this.getOpenid({
+            code, state
+          }, (openid) => {
+            this.openid = openid
+            this.getList()
+          })
+        } else {
+          this.toGetWxCode()
+        }
+      }
+    },
+    getList () {
+      let that = this
+      that.openId = '021I3kwd1Gd4is0ccIvd1JZ7wd1I3kwr'
+      let datas = {
+        openId: that.openId
+      }
+      borrowApi.refundList(datas, (rep) => {
+        let data = rep.data
+        if (data.code === 200 && data.data) {
+          let list = []
+          data.data.forEach((item) => {
+            list.push({
+              id: item.id,
+              avatar: BuouUtil.getResizeImgUrl(item.imageUrl, 'sm'),
+              imageId: item.imageId,
+              nickname: item.nickName,
+              createTime: BuouUtil.timeFomate(item.createTime, 's'),
+              braceletId: item.braceletId,
+              isSelect: false
+            })
+          })
+          that.list = list
+        }
+      })
+    },
+    applyRefund () {
+      let that = this
+      let braceletLogIds = []
+      that.list.forEach((item) => {
+        if (item.isSelect) braceletLogIds.push(item.braceletId)
+      })
+      let datas = {
+        braceletLogIds: braceletLogIds.join(),
+        orderId: ''
+      }
+      borrowApi.refund(datas, (rep) => {
+        let data = rep.data
+        if (data.code === 200 && data.data) {
+          that.$layout.msg('申请已经提交，请等待管理员确认')
+        } else {
+          that.$layout.msg(data.message || '申请已经提交有误，请重新提交')
+        }
+      })
+    },
     selectAll () {
       let that = this
       that.allisSelected = !that.allisSelected

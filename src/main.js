@@ -71,6 +71,7 @@ new Vue({
 
 /* regist routes hook */
 router.beforeEach((to, from, next) => {
+  document.title = to.meta.title
   var token = Vue.ls.get('memberToken')
   if (token) {
     next()

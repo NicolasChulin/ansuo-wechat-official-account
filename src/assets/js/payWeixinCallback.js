@@ -1,4 +1,4 @@
-import borrowApi from '@/apis/borrow'
+import homeApi from '@/apis/home'
 
 export default {
   name: 'pay-weixin-callback',
@@ -22,7 +22,7 @@ export default {
         code: that.code,
         state: that.state
       }
-      borrowApi.getOAuth2AccessToken(datas, (rep) => {
+      homeApi.getOAuth2AccessToken(datas, (rep) => {
         let data = rep.data
         if (data.code === 200 && data.data) {
           that.topay(data.data.openId)
@@ -36,7 +36,7 @@ export default {
       let datas = {
         orderNumber: that.orderNumber
       }
-      borrowApi.getJSSDKPayInfo(datas, (rep) => {
+      homeApi.getJSSDKPayInfo(datas, (rep) => {
         let data = rep.data
         if (data.code === 200 && data.data) {
           that.wxPayConf = JSON.parse(data.data)
@@ -74,7 +74,7 @@ export default {
       let datas = {
         orderNum: that.orderNumber
       }
-      borrowApi.findPayResult(datas, (rep) => {
+      homeApi.findPayResult(datas, (rep) => {
         let data = rep.data
         that.hasPayResult = true
         if (data.code === 200 && data.data) {

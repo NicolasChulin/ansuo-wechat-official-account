@@ -7,12 +7,18 @@ var borrow = [
   {
     path: '/borrow',
     name: 'Borrow',
-    component: Borrow
+    component: Borrow,
+    meta: {
+      title: '借出手环'
+    }
   },
   {
     path: '/refund',
     name: 'Refund',
-    component: Refund
+    component: Refund,
+    meta: {
+      title: '手环归还'
+    }
   },
   {
     path: '/pay/weixinCallback',
