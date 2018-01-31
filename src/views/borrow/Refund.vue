@@ -48,31 +48,31 @@ export default {
     NoneData
   },
   mounted () {
-    // this.initOpenid()
-    this.getList()
+    this.initOpenid()
+    // this.getList()
   },
   methods: {
     initOpenid () {
       if (!this.$isWeixin) return
-      this.openid = this.$ls.get('openid')
-      if (!this.openid) {
-        let code = this.$route.query.code
-        let state = this.$route.query.state
-        if (code && state) {
-          this.getOpenid({
-            code, state
-          }, (openid) => {
-            this.openid = openid
-            this.getList()
-          })
-        } else {
-          this.toGetWxCode()
-        }
-      }
+      this.openid = window.localStorage.getItem('openId')
+      if (this.openId) this.getList()
+      // if (!this.openid) {
+      //   let code = this.$route.query.code
+      //   let state = this.$route.query.state
+      //   if (code && state) {
+      //     this.getOpenid({
+      //       code, state
+      //     }, (openid) => {
+      //       this.openid = openid
+      //       this.getList()
+      //     })
+      //   } else {
+      //     this.toGetWxCode()
+      //   }
+      // }
     },
     getList () {
       let that = this
-      that.openId = '021I3kwd1Gd4is0ccIvd1JZ7wd1I3kwr'
       let datas = {
         openId: that.openId
       }

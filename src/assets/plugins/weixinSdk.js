@@ -21,7 +21,7 @@ export default {
             if (data.code === 200) {
               const wxApiList = ['scanQRCode']
               wx.config({
-                debug: true,
+                debug: false,
                 appId: data.data.appId,
                 timestamp: parseInt(data.data.timestamp),
                 nonceStr: data.data.nonceStr,

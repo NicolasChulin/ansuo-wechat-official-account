@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import borrowApi from '@/apis/borrow'
+
 export default {
   name: 'view-footer',
   props: ['mtype'],
@@ -46,14 +48,24 @@ export default {
         that.$router.push({name: item.type})
       } else {
         if (that.$isWeixin) {
-          that.registScanQRCode((res) => {
-            alert(res)
-            that.$router.push({
-              name: 'HomeDetail',
-              params: {
-                wristId: res
+          that.registScanQRCode((braceletId) => {
+            let datas = {
+              braceletId: braceletId
+            }
+            borrowApi.unBinding(datas, (rep) => {
+              let data = rep.data
+              if (data.code === 200 && data.data) {
+                that.$layout.msg('手环解绑成功！')
+              } else {
+                that.$layout.msg('手环解绑失败，请重新尝试！')
               }
             })
+            // that.$router.push({
+            //   name: 'HomeDetail',
+            //   params: {
+            //     wristId: res
+            //   }
+            // })
           })
         } else {
           that.$layout.msg('这是扫一扫')

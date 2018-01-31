@@ -29,11 +29,6 @@ export default {
       menuIndex: 0,
       menus: [
         {
-          name: '全部',
-          status: 0,
-          ref: 'slide0'
-        },
-        {
           name: '报警',
           status: 1,
           ref: 'slide1'
@@ -91,7 +86,7 @@ export default {
     overflow: hidden;
   }
   li{
-    width: 25%;
+    width: 33.33%;
     float: left;
     line-height: .8rem;
     text-align: center;

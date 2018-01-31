@@ -43,31 +43,31 @@ export default {
     NoneData
   },
   mounted () {
-    // this.initOpenid()
-    this.getList()
+    this.initOpenid()
+    // this.getList()
   },
   methods: {
     initOpenid () {
       if (!this.$isWeixin) return
-      this.openid = this.$ls.get('openid')
-      if (!this.openid) {
-        let code = this.$route.query.code
-        let state = this.$route.query.state
-        if (code && state) {
-          this.getOpenid({
-            code, state
-          }, (openid) => {
-            this.openid = openid
-            this.getList()
-          })
-        } else {
-          this.toGetWxCode()
-        }
-      }
+      this.openId = window.localStorage.getItem('openId')
+      if (this.openId) this.getList()
+      // if (!this.openId) {
+      //   let code = this.$route.query.code
+      //   let state = this.$route.query.state
+      //   if (code && state) {
+      //     this.getOpenid({
+      //       code, state
+      //     }, (openId) => {
+      //       this.openId = openId
+      //       this.getList()
+      //     })
+      //   } else {
+      //     this.toGetWxCode()
+      //   }
+      // }
     },
     getList () {
       let that = this
-      that.openId = '021I3kwd1Gd4is0ccIvd1JZ7wd1I3kwr'
       let datas = {
         openId: that.openId
       }
@@ -91,31 +91,16 @@ export default {
     },
     binding (item) {
       let that = this
-      // let braceids = ['123456', '234561', '345612', '123-01', '123-02', '123-03']
-      // let braceletId = braceids[Math.floor(Math.random() * 6)]
-      // let datas = {
-      //   braceletId: braceletId,
-      //   pictureId: item.id
-      // }
-      // borrowApi.binding(datas, (rep) => {
-      //   let data = rep.data
-      //   if (data.code === 200 && data.data) {
-      //     item.braceletId = braceletId
-      //     that.newBindIds.push(item.id)
-      //     that.$layout.msg('绑定成功！')
-      //   } else {
-      //     that.$layout.msg(data.message || '绑定失败，请重新尝试')
-      //   }
-      // })
       that.registScanQRCode((braceletId) => {
         let datas = {
           braceletId: braceletId,
-          pictureId: item.imageId
+          pictureId: item.id
         }
         borrowApi.binding(datas, (rep) => {
           let data = rep.data
           if (data.code === 200 && data.data) {
             item.braceletId = braceletId
+            that.newBindIds.push(data.data)
             that.$layout.msg('绑定成功！')
           } else {
             that.$layout.msg(data.message || '绑定失败，请重新尝试')
@@ -136,7 +121,10 @@ export default {
       borrowApi.makeOrder(datas, (rep) => {
         let data = rep.data
         if (data.code === 200 && data.data) {
-          let redirectUri = document.location.origin + '/pay/weixinCallback?orderNumber=' + data.data
+          alert(data.data)
+          let domain = 'http://image.buoumall.com'
+          let redirectUri = domain + '/payCallback.html?orderNum=' + data.data
+          // let redirectUri = document.location.origin + '/pay/weixinCallback?orderNumber=' + data.data
           window.location.href = that.GLOBAL.domain + '/redirectOAuth2Url?url=' + encodeURIComponent(redirectUri)
         } else {
           that.$layout.msg(data.message || '绑定失败，请重新尝试')
