@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="borrow-list">
-    <div class="b-list">
-      <ul v-if="list.length > 0">
+    <div v-if="list.length > 0">
+      <ul class="b-list">
         <li v-for="item in list">
           <div class="li-avatar">
             <img class="cover" :src="item.avatar" :alt="item.nickname">
@@ -15,13 +15,15 @@
           </div>
         </li>
       </ul>
-      <none-data v-else></none-data>
+      <div class="b-bot">
+        <i class="icon-weixin"></i>
+        <div class="btn-to-pay" @click="toPay"></div>
+        <!-- <router-link to="Refund">Refund</router-link> -->
+      </div>
     </div>
-    <div class="b-bot">
-      <i class="icon-weixin"></i>
-      <div class="btn-to-pay" @click="toPay"></div>
-      <router-link to="Refund">Refund</router-link>
-    </div>
+    <none-data v-else></none-data>
+
+
   </div>
 </template>
 

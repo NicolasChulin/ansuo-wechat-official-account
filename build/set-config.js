@@ -4,7 +4,7 @@ path = require('path');
 var configFilePath = path.resolve(__dirname, '../src/config.js')
 
 // var env = process.env.BUOUMALL_ENV.toLowerCase()
-var env = 'dev'
+var env = 'prod'
 var w_data = 'const CONFIG = require(\'./configs/' + env + '\')\r\nexport default CONFIG\r\n'
 var w_data = new Buffer(w_data)
 

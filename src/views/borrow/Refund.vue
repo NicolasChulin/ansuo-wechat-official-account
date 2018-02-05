@@ -1,47 +1,50 @@
 <template lang="html">
   <div class="refund">
-    <!-- <div class="b-top">
-      <p>报警手机号：18912345678</p>
-      <span>广告机编号：A02</span>
-    </div> -->
-    <div class="b-list">
-      <ul v-if="list.length > 0">
-        <li v-for="item in list">
+
+    <div class="b-main" v-if="list.length > 0">
+      <ul class="b-list" v-for="item in list">
+        <li class="li-title">订单号：{{item.orderId}}</li>
+        <li v-for="elem in item.bracelets">
           <div class="li-avatar">
-            <img class="cover" :src="item.avatar" :alt="item.nickname">
+            <img class="cover" :src="elem.avatar" :alt="elem.nickname">
           </div>
           <div class="li-infos">
-            <p><span>图片编号：</span><span>{{item.imageId}}</span></p>
-            <p><span>图片信息：</span><span>{{item.nickname}}</span></p>
-            <p><span>绑定时间：</span><span>{{item.createTime}}</span></p>
-            <p><span>手环编号：</span><span>{{item.braceletId}}</span></p>
+            <p><span>图片编号：</span>{{elem.imageId}}</p>
+            <p><span>图片信息：</span>{{elem.nickname}}</p>
+            <p><span>绑定时间：</span>{{elem.createTime}}</p>
+            <p><span>手环编号：</span>{{elem.braceletId}}</p>
           </div>
-          <span class="li-select" :class="{'icon-selected': item.isSelect, 'icon-unselected': !item.isSelect}" @click="item.isSelect = !item.isSelect"></span>
+          <span class="li-select" :class="{'icon-selected': elem.isSelect, 'icon-unselected': !elem.isSelect}" @click="selectElem(item, elem)"></span>
         </li>
       </ul>
-      <none-data v-else></none-data>
-    </div>
-    <div class="b-bot">
-      <div class="b-select" @click="selectAll">
-        <span class="select-icon" :class="{'icon-selected': allisSelected, 'icon-unselected': !allisSelected}"></span>
-        <span class="select-font"></span>
+      <div class="b-bot">
+        <!-- <div class="b-select" @click="selectAll">
+          <span class="select-icon" :class="{'icon-selected': allisSelected, 'icon-unselected': !allisSelected}"></span>
+          <span class="select-font"></span>
+        </div> -->
+        <div class="btn-refund-deposit" @click="applyRefund"></div>
       </div>
-      <div class="btn-refund-deposit" @click="applyRefund"></div>
     </div>
+    <div class="b-none" v-else>
+      <img class="h-auto" src="/static/images/tips-return.png" alt="提示">
+    </div>
+
   </div>
 </template>
 
 <script>
 import borrowApi from '@/apis/borrow'
-import BuouUtil from '@/assets/plugins/BuouUtil'
 import NoneData from '@/components/common/NoneData'
 
 export default {
   name: 'refund',
   data () {
     return {
+      openId: '',
       list: [],
-      allisSelected: false
+      allisSelected: false,
+      selectIds: [],
+      selectOrder: ''
     }
   },
   components: {
@@ -54,22 +57,8 @@ export default {
   methods: {
     initOpenid () {
       if (!this.$isWeixin) return
-      this.openid = window.localStorage.getItem('openId')
+      this.openId = window.localStorage.getItem('openId')
       if (this.openId) this.getList()
-      // if (!this.openid) {
-      //   let code = this.$route.query.code
-      //   let state = this.$route.query.state
-      //   if (code && state) {
-      //     this.getOpenid({
-      //       code, state
-      //     }, (openid) => {
-      //       this.openid = openid
-      //       this.getList()
-      //     })
-      //   } else {
-      //     this.toGetWxCode()
-      //   }
-      // }
     },
     getList () {
       let that = this
@@ -81,14 +70,23 @@ export default {
         if (data.code === 200 && data.data) {
           let list = []
           data.data.forEach((item) => {
+            let bracelets = []
+            item.pictureVos.forEach((elem) => {
+              bracelets.push({
+                imageId: elem.imageId,
+                avatar: that.GLOBAL.imgDomain + '/' + elem.imageUrl,
+                nickname: elem.nickName,
+                createTime: item.createTime,
+                braceletId: elem.braceletId,
+                braceletLogId: elem.braceletLogId,
+                isSelect: false
+              })
+            })
+
             list.push({
-              id: item.id,
-              avatar: BuouUtil.getResizeImgUrl(item.imageUrl, 'sm'),
-              imageId: item.imageId,
-              nickname: item.nickName,
-              createTime: BuouUtil.timeFomate(item.createTime, 's'),
-              braceletId: item.braceletId,
-              isSelect: false
+              orderId: item.orderId,
+              createTime: item.createTime,
+              bracelets
             })
           })
           that.list = list
@@ -97,22 +95,34 @@ export default {
     },
     applyRefund () {
       let that = this
-      let braceletLogIds = []
-      that.list.forEach((item) => {
-        if (item.isSelect) braceletLogIds.push(item.braceletId)
-      })
       let datas = {
-        braceletLogIds: braceletLogIds.join(),
-        orderId: ''
+        braceletLogIds: that.selectIds.join(),
+        orderId: that.selectOrder
       }
       borrowApi.refund(datas, (rep) => {
         let data = rep.data
         if (data.code === 200 && data.data) {
-          that.$layout.msg('申请已经提交，请等待管理员确认')
+          that.$layout.msg('申请已经提交，请等待后台系统处理')
+          that.getList()
         } else {
           that.$layout.msg(data.message || '申请已经提交有误，请重新提交')
         }
       })
+    },
+    selectElem (item, elem) {
+      if (this.selectOrder && item.orderId !== this.selectOrder) {
+        this.$layout.msg('很抱歉！一次只能退还同一个订单的手环')
+        return
+      }
+      this.selectOrder = item.orderId
+      if (elem.isSelect) {
+        let index = this.selectIds.indexOf(elem.braceletLogId)
+        this.selectIds.splice(index, 1)
+      } else {
+        this.selectIds.push(elem.braceletLogId)
+      }
+      elem.isSelect = !elem.isSelect
+      if (!this.selectIds.length) this.selectOrder = ''
     },
     selectAll () {
       let that = this
@@ -126,25 +136,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .b-top{
-//   padding: .4rem 0 .3rem;
-//   text-align: center;
-//   p{
-//     color: $brown;
-//     margin-bottom: .2rem;
-//   }
-//   span{
-//     display: block;
-//     margin: 0 auto;
-//     border-radius: .5rem;
-//     width: 3rem;
-//     height: .5rem;
-//     line-height: .5rem;
-//     background-color: $pbrown;
-//     color: #fff;
-//     font-size: .24rem;
-//   }
-// }
 .icon-unselected{
   background-image: url('/static/images/icon-unselected.png');
   background-size: 100% 100%;
@@ -154,7 +145,8 @@ export default {
   background-size: 100% 100%;
 }
 .b-list{
-  padding: 0 .2rem;
+  padding: .2rem;
+  border-bottom:  1px solid $borderGray;
 
   li{
     margin-bottom: .15rem;
@@ -163,6 +155,12 @@ export default {
     position: relative;
     padding: .4rem 1rem .4rem .2rem;
     height: 2.4rem;
+  }
+  li.li-title{
+    height: .8rem;
+    line-height: .8rem;
+    box-shadow: none;
+    padding: 0;
   }
   .li-avatar{
     width: 1.6rem;
@@ -178,16 +176,16 @@ export default {
     p{
       height: .4rem;
       line-height: .4rem;
-      font-size: 0;
-      color: $gbrown;
+      font-size: .24rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       span{
         display: inline-block;
         vertical-align: middle;
-        font-size: .24rem;
+        color: $gbrown;
       }
-      span:last-child{
-        color: $pbrown;
-      }
+
     }
   }
   .li-select{
@@ -199,6 +197,9 @@ export default {
     top: 50%;
     margin-top: -.3rem;
   }
+}
+.b-list:last-of-type{
+  border: 0;
 }
 .b-bot{
   margin-top: .5rem;
@@ -231,5 +232,11 @@ export default {
     background-image: url('/static/images/btn-refund-deposit.png');
     background-size: 100% 100%;
   }
+}
+.b-none{
+  padding-top: 100px;
+  width: 60%;
+  margin: 0 auto;
+
 }
 </style>
