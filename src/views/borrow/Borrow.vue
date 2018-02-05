@@ -29,7 +29,7 @@
 
 <script>
 import borrowApi from '@/apis/borrow'
-import BuouUtil from '@/assets/plugins/BuouUtil'
+// import BuouUtil from '@/assets/plugins/BuouUtil'
 import NoneData from '@/components/common/NoneData'
 
 export default {
@@ -80,16 +80,19 @@ export default {
           data.data.forEach((item) => {
             list.push({
               id: item.id,
-              avatar: BuouUtil.getResizeImgUrl(item.imageUrl, 'sm'),
+              avatar: that.GLOBAL.imgDomain + '/' + item.imageUrl,
               imageId: item.imageId,
-              nickname: item.nickName,
-              createTime: BuouUtil.timeFomate(item.createTime, 's'),
+              nickname: that.getNickname(item),
+              createTime: item.createTime,
               braceletId: item.braceletId
             })
           })
           that.list = list
         }
       })
+    },
+    getNickname (item) {
+      return item.age + '岁  ' + (item.sex ? '男' : '女 ')
     },
     binding (item) {
       let that = this
@@ -123,7 +126,6 @@ export default {
       borrowApi.makeOrder(datas, (rep) => {
         let data = rep.data
         if (data.code === 200 && data.data) {
-          alert(data.data)
           let domain = 'http://image.buoumall.com'
           let redirectUri = domain + '/payCallback.html?orderNum=' + data.data
           // let redirectUri = document.location.origin + '/pay/weixinCallback?orderNumber=' + data.data

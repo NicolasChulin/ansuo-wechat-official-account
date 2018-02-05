@@ -75,7 +75,7 @@ export default {
               bracelets.push({
                 imageId: elem.imageId,
                 avatar: that.GLOBAL.imgDomain + '/' + elem.imageUrl,
-                nickname: elem.nickName,
+                nickname: that.getNickname(elem),
                 createTime: item.createTime,
                 braceletId: elem.braceletId,
                 braceletLogId: elem.braceletLogId,
@@ -93,8 +93,15 @@ export default {
         }
       })
     },
+    getNickname (item) {
+      return item.age + '岁  ' + (item.sex ? '男' : '女 ')
+    },
     applyRefund () {
       let that = this
+      if (!that.selectIds.length) {
+        that.$layout.msg('请选择要申请退款的手环')
+        return
+      }
       let datas = {
         braceletLogIds: that.selectIds.join(),
         orderId: that.selectOrder
@@ -102,8 +109,9 @@ export default {
       borrowApi.refund(datas, (rep) => {
         let data = rep.data
         if (data.code === 200 && data.data) {
-          that.$layout.msg('申请已经提交，请等待后台系统处理')
-          that.getList()
+          that.$router.push({
+            name: 'RefundSuccess'
+          })
         } else {
           that.$layout.msg(data.message || '申请已经提交有误，请重新提交')
         }

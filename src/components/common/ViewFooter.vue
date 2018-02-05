@@ -57,7 +57,7 @@ export default {
               if (data.code === 200 && data.data) {
                 that.$layout.msg('手环解绑成功！')
               } else {
-                that.$layout.msg('手环解绑失败，请重新尝试！')
+                that.$layout.msg(data.message || '手环解绑失败，请重新尝试！')
               }
             })
             // that.$router.push({
